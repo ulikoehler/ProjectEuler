@@ -1,4 +1,3 @@
-
 isPalindrome :: Integer -> Bool
 isPalindrome int = let lst = show int
                        palTuples = zip lst (reverse lst)
