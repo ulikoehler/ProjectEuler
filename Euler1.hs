@@ -1,12 +1,7 @@
-import Math.NumberTheory.Primes.Factorisation
-
 isMultipleOf3Or5 :: Integer -> Bool
-isMultipleOf3Or5 num = isFactor3Or5 $ map fst $ factorise num
-
-isFactor3Or5 :: [Integer] -> Bool
-isFactor3Or5 [] = False
-isFactor3Or5 (x:[]) = (x == 3 || x == 5)
-isFactor3Or5 (x:xs) = False
+isMultipleOf3Or5 num = let rem3 = num `rem` 3
+                           rem5 = num `rem` 5
+                       in (rem3 == 0 || rem5 == 0)
 
 main = do
-    print $ sum $ filter isMultipleOf3Or5 [1..10]
+    print $ sum $ filter isMultipleOf3Or5 [1..999]
