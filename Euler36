@@ -1,0 +1,23 @@
+import Data.List
+import Numeric
+import Data.Char (intToDigit)
+
+isDecimalPalindrome :: Integer -> Bool
+isDecimalPalindrome int = let lst = showIntAtBase 10 intToDigit int ""
+                              palTuples = zip lst (reverse lst)
+                          in all tupleEq palTuples
+
+isBinaryPalindrome :: Integer -> Bool
+isBinaryPalindrome int = let lst = showIntAtBase 2 intToDigit int ""
+                             palTuples = zip lst (reverse lst)
+                         in all tupleEq palTuples
+
+isBothBasesPalindrome :: Integer -> Bool
+isBothBasesPalindrome int = (isDecimalPalindrome int && isBinaryPalindrome int)
+                   
+tupleEq :: (Eq a0) => (a0, a0) -> Bool
+tupleEq tp = (fst tp) == (snd tp)
+
+main = do
+    let space = [0..1000000]
+    print $ sum $ filter isBothBasesPalindrome space
