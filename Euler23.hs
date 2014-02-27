@@ -11,7 +11,9 @@ sumProperDivisors = sum . properDivisors
 isAbundant n = sumProperDivisors n > n
 
 main = do
-    let abundantNumbers = filter isAbundant [1..28123]
-    let sumAbundantNumbers = [x+y | x <- abundantNumbers, y <- abundantNumbers]
-    let notAbundantSummable = nub $ [1..28123] \\ sumAbundantNumbers
-    print $ sum $ notAbundantSummable
+    let limit = 29000
+    let baseNumberSet = Set.fromList [1..limit]
+    let abundantNumbers = filter isAbundant [1..limit]
+    let sumAbundantNumbers = Set.fromList [x+y | x <- abundantNumbers, y <- abundantNumbers, (x+y) <= limit]
+    let notAbundantSummable = baseNumberSet Set.\\ sumAbundantNumbers
+    print $ sum $ Set.toList notAbundantSummable
