@@ -9,7 +9,7 @@ isSquare n = sq * sq == n
     where sq = floor $ sqrt $ (fromIntegral n :: Double)
 
 isAlmostEquilateral t@(Triangle a b c) =
-    let p = (perimeter t) `div` 2
+    let p = perim / 2
         perim = perimeter t
     in isSquare (p * (p - a) * (p - b) * (p - c))
 
