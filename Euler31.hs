@@ -9,7 +9,7 @@ main = do
     -- How many coins of one value form the target value
     let singleCoinMax = [targetValue `div` coin | coin <- coins] :: [Int]
     -- Brute-force all possibilities
-    let combinations = sequence $ map (\n -> [1..n]) singleCoinMax
+    let combinations = sequence $ map (\n -> [0..n]) singleCoinMax
     let computeValue vals = sum $ map (uncurry (*)) $ zip vals coins
     let correctCombos = filter (\v -> targetValue == computeValue v) combinations
     print $ length correctCombos
