@@ -9,9 +9,20 @@
 using namespace std;
 using boost::lexical_cast;
 
+const int limit = 10000;
+
+//cubeTable[n] = n*n*n
+static uint64_t cubeTable[limit];
+
 bool isCube(uint64_t n) {
-    uint64_t root = std::cbrt(n);
-    return (root * root * root == n);
+    for (int i = 0; i < limit; ++i) {
+        if (n == cubeTable[i]) {
+            return true;
+        } else if(n < cubeTable[i]) { //cubeTable is strictly ordered
+            return false;
+        }
+    }
+    return true;
 }
 
 //http://stackoverflow.com/a/2031708/2597135
@@ -37,17 +48,21 @@ int numCubePermutations(uint64_t n) {
         permutation(n, s);
         //Re-parse as int
         uint64_t val = lexical_cast<uint64_t>(s);
-        //cout << val << endl;
         numCubes += isCube(val) ? 1 : 0;
     }
-    return numCubes / 2;
+    return numCubes / 2; //Not sure why / 2, but cubes always occur two times
 }
 
 int main(int argc, char** argv) {
-    #pragma omp parallel for
-    for (uint64_t i = 0; i < 10000; ++i) {
-        if(numCubePermutations(i * i * i) == 5) {
-            cout << i << endl;
+    for (uint64_t i = 0; i < limit; ++i) {
+        cubeTable[i] = i * i * i;
+    }
+    //#pragma omp parallel for
+    for (uint64_t i = 0; i < limit; ++i) {
+        int n = numCubePermutations(i * i * i);
+        cout << "#" << i << ": " << n << " - " << i*i*i << endl;
+        if(n == 5) {
+            return 0;
         }
     }
 }
