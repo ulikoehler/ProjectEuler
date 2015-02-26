@@ -7,7 +7,7 @@ isInA :: Integer -> Bool
 isInA n =
     let logV = integerLogBase ds n
         ds = digitSum n
-    in fromIntegral (ds ^ logV) == n
+    in if ds == 1 then False else fromIntegral (ds ^ logV) == n
 
 main :: IO ()
 main = do
