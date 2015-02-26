@@ -1,67 +1,71 @@
-
 #include <iostream>
 #include <cmath>
 #include <string>
+#include <cassert>
+#include <vector>
+#include <map>
 #include <limits>
+#include <string>
+#include <cstring>
 #include <algorithm>
-#include <boost/lexical_cast.hpp>
 
 using namespace std;
-using boost::lexical_cast;
 
 const int limit = 10000;
 
 //cubeTable[n] = n*n*n
 static uint64_t cubeTable[limit];
 
-bool isCube(uint64_t n) {
-    for (int i = 0; i < limit; ++i) {
-        if (n == cubeTable[i]) {
-            return true;
-        } else if(n < cubeTable[i]) { //cubeTable is strictly ordered
-            return false;
-        }
-    }
-    return true;
-}
+/**
+ * For every n, cubesByLength[n] stores a list of cubes
+ * with length n when represented as decimal string.
+ */
+static std::vector<std::string> cubesByLength[32];
 
-//http://stackoverflow.com/a/2031708/2597135
-void permutation(int k, string &s)  {
-    for(int j = 1; j < s.size(); ++j)  {
-        std::swap(s[k % (j + 1)], s[j]); 
-        k = k / (j + 1);
-    }
-}
 
-uint64_t factorial(uint64_t x) {
-    static const uint64_t f[13] = { 1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800, 39916800, 479001600};
-    if ((unsigned)x < (sizeof f/sizeof f[0])) return f[x];
-    else return std::numeric_limits<uint64_t>::max(); /* or your favorite undefined behavior */
-}
-
-int numCubePermutations(uint64_t n) {
-    int numCubes = 0;
-    std::string origS = std::to_string(n);
-    //Fast serialization of permutations using memcpy
-    for (int n = 0; n < factorial(origS.size()); ++n) {
-        std::string s = origS; //Without copy we don't get unique permutations
-        permutation(n, s);
-        //Re-parse as int
-        uint64_t val = lexical_cast<uint64_t>(s);
-        numCubes += isCube(val) ? 1 : 0;
+/**
+ * Check if two strings contain exactly the same digits.
+ * Permutations are considered equal.
+ * Precondition: Both strings contain only digits and are of length
+ */
+bool isPermutationOf(const char* a, const char* b, size_t n) {
+    //Counts how many times digit n (0..9) occurs in the string
+    uint32_t countA[10];
+    memset(countA, 0, sizeof(uint32_t) * 10);
+    uint32_t countB[10];
+    memset(countB, 0, sizeof(uint32_t) * 10);
+    for (int i = 0; i < n; ++i) {
+        countA[a[i] - '0']++;
+        countB[b[i] - '0']++;
     }
-    return numCubes / 2; //Not sure why / 2, but cubes always occur two times
+    return memcmp(countA, countB, sizeof(uint32_t) * 10) == 0;
 }
 
 int main(int argc, char** argv) {
+    //Initialize cube map
     for (uint64_t i = 0; i < limit; ++i) {
-        cubeTable[i] = i * i * i;
+        uint64_t cube = i * i * i;
+        std::string cubeStr = std::to_string(cube);
+        cubesByLength[cubeStr.size()].push_back(cubeStr);
     }
+
     //#pragma omp parallel for
     for (uint64_t i = 0; i < limit; ++i) {
-        int n = numCubePermutations(i * i * i);
-        cout << "#" << i << ": " << n << " - " << i*i*i << endl;
-        if(n == 5) {
+        uint64_t cube = i * i * i;
+        const std::string cubeStr = std::to_string(cube);
+        /**
+         * Only strings of the same size are candidates for permuted cubes.
+         * We already initialized a size-sorted list of cubes.
+         * We only check how many of the known cubes are permutations of the given number.
+         */
+        std::vector<std::string>& cubes = cubesByLength[cubeStr.size()];
+        uint32_t count = count_if(cubes.begin(), cubes.end(), [&](const std::string& refCube) {
+            assert(refCube.size() == cubeStr.size());
+            return isPermutationOf(cubeStr.data(), refCube.data(), cubeStr.size());
+        });
+        //Print only the solution
+        if(count == 5) {
+            cout << cube << " (" << i << " ** 3)" << endl;
             return 0;
         }
     }
