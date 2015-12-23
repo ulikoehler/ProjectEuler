@@ -16,8 +16,10 @@ isSameAsDigitSumPower5 n = (n == digitSumPower5 n)
 isPythagoreanTriplet a b c = ((a * a) + (b * b) == (c * c))
 
 main = do
-    let base = [1..1000] :: [Int]
-    let solutions n = [(a,b) | a <- base, b <- base, c <- base, isPythagoreanTriplet a b c, (a+b+c) == n]
-    let numSolutions n = (`div` 2) $ length $ solutions n
-    print $ zip (map numSolutions [1..1000]) [1..]
-
+    let base n = [1..1000] :: [Int]
+    let filtBase n = [1..(n - 2)] -- To leave >= 1 space for the other edges
+    let solutions n = [(a, b, n - (a + b)) | a <- base n, b <- base n, a < b, (a + b) < (n - 1), isPythagoreanTriplet a b (n - (a + b))]
+    let numSolutions n = length $ solutions n
+    let ns = [1..1000]
+    let numSolutionsMap = zip ns $ parMap rdeepseq numSolutions ns :: [(Int, Int)]
+    print $ filter (\(_,n) -> n > 0) numSolutionsMap
