@@ -1,5 +1,5 @@
-import Text.Numeral.Grammar.Reified ( defaultInflection )
-import qualified Text.Numeral.Language.EN as EN
+import Text.Numeral.Grammar ( defaultInflection )
+import qualified Text.Numeral.Language.ENG as EN
 import Data.Maybe
 import Data.List
 
@@ -7,7 +7,7 @@ import Data.List
 removeQuotes name = reverse $ drop 1 $ reverse $ drop 1 name
 
 toword :: Integer -> String
-toword num = removeQuotes $ show $ fromJust $ EN.us_cardinal defaultInflection num
+toword num = removeQuotes $ show $ fromJust $ EN.gb_cardinal defaultInflection num
 
 isSpecialChar c = (c == ' ' || c == '-')
 
@@ -18,4 +18,4 @@ countDistinctChars str = length $ nub $ sort str
 
 main = do
     let space = [1..5000]
-    print $ filterSpecialChars $ toword 342
+    print  $ toword 342
