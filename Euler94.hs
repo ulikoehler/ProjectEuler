@@ -15,8 +15,8 @@ isAlmostEquilateral t@(a, b, c) =
 
 limit = 1000000000 :: Integer
 genTriangles a = [(a, a, (a-1)), (a, a, (a+1))] :: [Triangle]
-allTriangles = concatMap genTriangles [1..] :: [Triangle]
-
+-- Even a's always generate odd perimters
+allTriangles = concatMap genTriangles [1,3..] :: [Triangle]
 relevantTriangles = takeWhile ((>=) limit . perimeter) allTriangles :: [Triangle]
 
 parFilter :: Strategy Bool -> (a -> Bool) -> [a] -> [a]
