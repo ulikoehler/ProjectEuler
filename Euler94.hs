@@ -1,27 +1,30 @@
+import Math.NumberTheory.Powers.Squares (isSquare)
+import Control.Parallel.Strategies
 
-
-data Triangle = Triangle Integer Integer Integer deriving (Show)
+type Triangle = (Integer, Integer, Integer)
 
 perimeter :: Triangle -> Integer
-perimeter (Triangle a b c) = a + b + c
+perimeter (a, b, c) = a + b + c
 
-isSquare n = sq * sq == n
-    where sq = floor $ sqrt $ (fromIntegral n :: Double)
-
-isAlmostEquilateral t@(Triangle a b c) =
-    let p = perim `div` 2
-        perim = perimeter t
-    in even perim && isSquare (p * (p - a) * (p - b) * (p - c))
+isAlmostEquilateral :: Triangle -> Bool
+isAlmostEquilateral t@(a, b, c) =
+    let s2 = perimeter t -- Two times s
+        s = quot s2 2
+        v = s*(s-a)*(s-b)*(s-c)
+    in (s * 2 == s2) && (isSquare v)
 
 limit = 1000000000 :: Integer
+genTriangles a = [(a, a, (a-1)), (a, a, (a+1))] :: [Triangle]
+allTriangles = concatMap genTriangles [1..] :: [Triangle]
 
-genTriangles a = [Triangle a a (a-1), Triangle a a (a+1)]
+relevantTriangles = takeWhile ((>=) limit . perimeter) allTriangles :: [Triangle]
 
-allTriangles =
-    concatMap genTriangles [1..]
-
-relevantTriangles = takeWhile ((>=) limit . perimeter) allTriangles
+parFilter :: Strategy Bool -> (a -> Bool) -> [a] -> [a]
+parFilter strat fn lst =
+    let boolList = parMap strat fn lst :: [Bool]
+    in map fst $ filter snd $ zip lst boolList
 
 main = do
-    let aeTriangles = filter isAlmostEquilateral $ relevantTriangles
+    let aeTriangles = parFilter rdeepseq isAlmostEquilateral $ relevantTriangles
     print $ sum $ map perimeter $ aeTriangles
+    -- print $ aeTriangles
