@@ -25,6 +25,6 @@ parFilter strat fn lst =
     in map fst $ filter snd $ zip lst boolList
 
 main = do
-    let aeTriangles = parFilter rdeepseq isAlmostEquilateral $ relevantTriangles
+    let aeTriangles = filter isAlmostEquilateral $ relevantTriangles
     print $ sum $ map perimeter $ aeTriangles
     print $ aeTriangles
