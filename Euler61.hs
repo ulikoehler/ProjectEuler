@@ -2,6 +2,9 @@ import Control.GroupWith
 import qualified Data.Set as S
 import qualified Data.Map as M
 import Data.Maybe
+import Data.Graph.Inductive.Graph
+import Data.Graph.Inductive.PatriciaTree
+import Data.Graph.Analysis.Algorithms.Common
 
 triangle n = n * (n+1) `div` 2
 square n = n * n
@@ -32,6 +35,8 @@ first2Of4, last2Of4 :: Integer -> Integer
 first2Of4 = read . take 2 . show
 last2Of4 = read . drop 2 . show
 
+
+foo :: [(Integer, Integer)]
 foo =
     let lastDigitMap = groupWith last2Of4 polygonals4digits
         firstDigitMap = groupWith first2Of4 polygonals4digits
@@ -40,8 +45,25 @@ foo =
         pairsFstSet = S.fromList $ map fst pairs
         pairsSndSet = S.fromList $ map snd pairs
         -- Find pairs whose second element also has a partner
-        pairsWithPartner = filter (\(_,b) -> S.member b pairsFstSet && ) pairs
+        pairsWithPartner = filter (\(a,b) -> S.member b pairsFstSet
+                                    && S.member a pairsSndSet) pairs
     in pairsWithPartner
 
+-- mkUGraph :: [Int] -> [(Int, Int)] -> UGr
+-- mkUGraph nodes edges =
+--     let xnodes = map (\n -> (n, ())) nodes
+--         xedges = map (\(a,b) -> (a, b, ())) edges
+--     in mkGraph xnodes xedges
+
+mkUGraphInteger :: [(Integer)] -> [(Integer, Integer)] -> UGr
+mkUGraphInteger nodes edges =
+    mkUGraph (map fromIntegral nodes)
+             (map (\(a,b) -> (fromIntegral a, fromIntegral b)) edges)
+
+-- bar :: [(Integer, Integer)]
+bar edges =
+    let nodes = S.toList $ S.fromList $ concat [map fst edges, map snd edges]
+    in filter ((== 6 ). length) $ cyclesIn $ mkUGraphInteger nodes edges
+
 main = do
-    print $ length foo
+    print $ bar foo
