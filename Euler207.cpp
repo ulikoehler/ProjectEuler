@@ -13,15 +13,12 @@ inline double t(double k) {
 
 inline bool isnat(double v) { return abs(v - round(v)) < 1e-6; }
 
-const int n = 1000000;
-vector<bool> isperfect(n);
-vector<bool> isvalid(n);
-
 void Ps() {
   size_t num = 0, denom = 0;
   for (size_t i = 2; i; i++) {
     double tv = t(i);
-    bool isvalid = isnat(pow(4.0, tv));
+    // 4^tv == 2^tv + some int but 2^tv is much smaller
+    bool isvalid = isnat(pow(2.0, tv));
     bool isperfect = isvalid && isnat(tv);
     num += isperfect ? 1 : 0;
     denom += isvalid ? 1 : 0;
@@ -39,13 +36,5 @@ void Ps() {
 }
 
 int main() {
-  cout << "Compute..." << endl;
-  for (size_t k = 2; k < n; k++) {
-    double tv = t(k);
-    isvalid[k] = isnat(pow(4.0, tv));
-    isperfect[k] = isvalid[k] && isnat(tv);
-  }
-  cout << isnat(4.1) << ", " << round(4.1) << " " << isnat(4.0) << endl;
-  cout << "P..." << endl;
   Ps();
 }
