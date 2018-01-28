@@ -26,7 +26,8 @@ def P(m):
 #print(P(180))
 #print(P(185))
 
-for m in range(2, ns.shape[0]):
+
+for m in range(2, 1000000):
     if P(m) < fractions.Fraction(1,1234567):
         print("Result",m)
     if m % 100000 == 0:
